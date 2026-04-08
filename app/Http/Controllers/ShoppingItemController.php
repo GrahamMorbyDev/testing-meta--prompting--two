@@ -41,6 +41,20 @@ class ShoppingItemController extends Controller
     }
 
     /**
+     * Toggle the completed (purchased) state of the specified shopping item.
+     */
+    public function toggle(ShoppingItem $shoppingItem, Request $request)
+    {
+        if ($shoppingItem->user_id !== $request->user()->id) {
+            abort(403);
+        }
+
+        $shoppingItem->toggleCompleted();
+
+        return redirect()->back()->with('success', 'Item updated.');
+    }
+
+    /**
      * Remove the specified shopping item.
      */
     public function destroy(ShoppingItem $shoppingItem, Request $request)

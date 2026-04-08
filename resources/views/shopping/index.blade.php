@@ -1,90 +1,84 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Shopping List</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 min-h-screen">
-    @extends('layouts.app')
+<?php echo '<?php'; ?>
+@extends('layouts.app')
 
-    @section('content')
-    <div class="max-w-3xl mx-auto py-12 px-4">
-        <div class="bg-white shadow rounded-lg p-6">
-            <h1 class="text-2xl font-semibold mb-4">Shopping List</h1>
+@section('content')
+<div class="max-w-3xl mx-auto p-6">
+    <h1 class="text-2xl font-semibold mb-4">Shopping List</h1>
 
-            @if(session('success'))
-                <div class="mb-4 p-3 bg-green-100 text-green-800 rounded">{{ session('success') }}</div>
-            @endif
+    {{-- Add Item Form --}}
+    <div class="bg-white shadow rounded-lg p-4 mb-6">
+        <form action="{{ route('shopping.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+            @csrf
 
-            @if($errors->any())
-                <div class="mb-4 p-3 bg-red-50 text-red-800 rounded">
-                    <ul class="list-disc list-inside">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700">Name</label>
+                <input name="name" required type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Apples">
+            </div>
 
-            <form action="{{ route('shopping.store') }}" method="POST" class="mb-6 space-y-4">
-                @csrf
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Quantity</label>
+                <input name="quantity" required type="number" min="1" value="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
 
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                    <input id="name" name="name" type="text" required value="{{ old('name') }}"
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-                </div>
+            <div class="md:col-span-4">
+                <label class="block text-sm font-medium text-gray-700">Notes (optional)</label>
+                <input name="notes" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Granny Smith">
+            </div>
 
-                <div>
-                    <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
-                    <input id="quantity" name="quantity" type="number" min="1" value="{{ old('quantity', 1) }}"
-                           class="mt-1 block w-32 rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-                </div>
+            <div class="md:col-span-4">
+                <button type="submit" class="mt-2 inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Add Item
+                </button>
+            </div>
+        </form>
 
-                <div>
-                    <label for="notes" class="block text-sm font-medium text-gray-700">Notes (optional)</label>
-                    <textarea id="notes" name="notes" rows="3"
-                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">{{ old('notes') }}</textarea>
-                </div>
-
-                <div>
-                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">Add Item</button>
-                </div>
-            </form>
-
-            <hr class="my-4" />
-
-            <h2 class="text-lg font-medium mb-3">Items</h2>
-
-            @if($items->isEmpty())
-                <p class="text-sm text-gray-500">No items yet.</p>
-            @else
-                <ul class="space-y-3">
-                    @foreach($items as $item)
-                        <li class="flex items-start justify-between bg-gray-50 p-3 rounded">
-                            <div>
-                                <div class="font-semibold text-gray-800">{{ $item->name }} <span class="text-sm text-gray-600">&times; {{ $item->quantity }}</span></div>
-                                @if($item->notes)
-                                    <div class="text-sm text-gray-600 mt-1">{{ $item->notes }}</div>
-                                @endif
-                                <div class="text-xs text-gray-400 mt-1">Added {{ $item->created_at->diffForHumans() }}</div>
-                            </div>
-
-                            <div class="flex-shrink-0 ml-4">
-                                <form action="{{ route('shopping.destroy', $item) }}" method="POST" onsubmit="return confirm('Delete this item?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-red-600 text-white text-sm rounded hover:bg-red-700">Delete</button>
-                                </form>
-                            </div>
-                        </li>
+        @if ($errors->any())
+            <div class="mt-3 text-sm text-red-600">
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
                     @endforeach
                 </ul>
-            @endif
-        </div>
+            </div>
+        @endif
     </div>
-    @endsection
-</body>
-</html>
+
+    {{-- Items List --}}
+    <div class="bg-white shadow rounded-lg p-4">
+        @if($items->count())
+            <ul class="space-y-3">
+                @foreach($items as $item)
+                    <li class="flex items-start justify-between border p-3 rounded">
+                        <div>
+                            <div class="flex items-baseline space-x-3">
+                                <h3 class="text-lg font-medium">{{ $item->name }}</h3>
+                                <span class="text-sm text-gray-500">x {{ $item->quantity }}</span>
+                            </div>
+
+                            @if($item->notes)
+                                <p class="text-sm text-gray-600 mt-1">{{ $item->notes }}</p>
+                            @endif
+
+                            <p class="text-xs text-gray-400 mt-2">Added {{ $item->created_at->diffForHumans() }}</p>
+                        </div>
+
+                        <div class="flex items-center space-x-2">
+                            <form action="{{ route('shopping.destroy', $item) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-red-600 text-white text-sm rounded hover:bg-red-700">Delete</button>
+                            </form>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+
+            <div class="mt-4 text-sm text-gray-600">
+                Showing {{ $items->count() }} item(s).
+            </div>
+        @else
+            <div class="text-gray-600">No items yet. Add some using the form above.</div>
+        @endif
+    </div>
+</div>
+@endsection
